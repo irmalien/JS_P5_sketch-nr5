@@ -6,12 +6,10 @@
 //   redraw();
 // }
 
-// function mousePressed() {
-//   for(i = objArr.length-1; i >= 0; i-- ){
-//     objArr[i].randomizeHue();
-//     objArr[i].randomizeDNKC();
-//   }
-// }
+function mousePressed() {
+  objScene.quantity++
+  objArr.push(new Atom(mouseX, mouseY, objSettings))
+}
 
 // function mouseReleased() {
 //   for(i = objArr.length-1; i >= 0; i-- ){
@@ -47,13 +45,14 @@ function keyPressed() {
   //   for(i = objArr.length-1; i >= 0; i-- ){
   //     objArr[i].newPlayspeed = true;
   //   }
-  // } else if (keyCode === UP_ARROW) {
-  //   quantity++
-  // } else if (keyCode === DOWN_ARROW) {
-  //   quantity--
-  //   if (quantity < 1) {
-  //     quantity=1
-  //   }
+  else if (keyCode === UP_ARROW) {
+    quantity++
+  } else if (keyCode === DOWN_ARROW) {
+    quantity--
+    if (quantity < 1) {
+      quantity=1
+    }
+  }
   // } else if (keyCode === 77) {
   //   for(i = objArr.length-1; i >= 0; i-- ){
   //     objArr[i].randomizeDNKC();

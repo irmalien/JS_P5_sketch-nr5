@@ -54,12 +54,14 @@ colArray = [];
 
 function selectColor(){
   const color = []
-  colRand = int(random(0, this.colArray.length));
-  color[0] = this.colArray[this.colRand][0];
-  color[1]= this.colArray[this.colRand][1];
-  color[2]= this.colArray[this.colRand][2];
+  colRand = int(random(0, colArray.length));
+  color[0] = colArray[colRand][0];
+  color[1]= colArray[colRand][1];
+  color[2]= colArray[colRand][2];
   return color;
 }
+
+//TODO makeClass for colorArray+ColorSelection
 
 
 function selectPalette(white = true, black = false, size = 5, selected = undefined){
