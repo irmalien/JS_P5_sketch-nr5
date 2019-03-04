@@ -123,13 +123,13 @@ function createGUI() {
   f2.add(objSettings, 'tremble', 0, 100).step(1);
   f2.add(objSettings, 'scatter', 0, 5).step(0.1);
 
-  let f3 = gui.addFolder('Colors');
-  objColors = new initColors();
-  f3.addColor(objColors, 'color1');
-  f3.addColor(objColors, 'color2');
-  f3.addColor(objColors, 'color3');
-  f3.addColor(objColors, 'color4');
-  f3.addColor(objColors, 'color5');
+  // let f3 = gui.addFolder('Colors');
+  // objColors = new initColors();
+  // f3.addColor(objColors, 'color1');
+  // f3.addColor(objColors, 'color2');
+  // f3.addColor(objColors, 'color3');
+  // f3.addColor(objColors, 'color4');
+  // f3.addColor(objColors, 'color5');
   
   f1.open();
   f2.open();
