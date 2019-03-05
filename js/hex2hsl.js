@@ -37,5 +37,4 @@ function hexToHSL(hex) {
   colorInHSL[2]=l;
 
   return colorInHSL;
-  // $rootScope.$emit('colorChanged', {colorInHSL});
 }

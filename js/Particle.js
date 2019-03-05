@@ -1,18 +1,19 @@
-class Atom {
-  constructor(_x, _y, _atom) {    
+class Particle {
+  constructor(_x, _y, _particle, _color=undefined) {    
     //POSITION
     this.x = _x;
     this.y = _y;
     
     //VALUES
-    this.setValues(_atom);
+    this.setValues(_particle);
     if(this.flexibleValues){
       this.gaussianValues();
     };
-    this.sizeAmplitude = this.setSizeAmplitude(this.sizeConst, this.sizeRand)
+    this.sizeAmplitude = this.setSizeAmplitude(this.sizeConst, this.sizeRand);
+
 
     //COLOR
-    this.color = selectColor();
+    this.setColor(_color);
 
     //PERLIN
     this.xoffX = random(1000);
@@ -32,23 +33,27 @@ class Atom {
   }
 
   //====INITIALIZE===================
-  setValues(_atom){
+  setValues(_particle){
     //OBJECT
-    this.flexibleValues = _atom.flexibleValues;
-    this.lifespan = _atom.lifespan;
-    this.lifespanMaxValue = _atom.lifespanMaxValue
-    this.sizeConst = (_atom.size**2)/10;
-    this.sizeRand = _atom.sizeVariation;
+    this.flexibleValues = _particle.flexibleValues;
+    this.lifespan = _particle.lifespan;
+    this.lifespanMaxValue = _particle.lifespanMaxValue
+    this.sizeConst = (_particle.size**1.1)/2
+    this.sizeRand = _particle.sizeVariation;
+    this.opacity = _particle.opacity/100;
 
     //DYNAMICS
-    this.movSpeed = _atom.speed/200;
-    this.movVer = _atom.vertical;
-    this.movHor = _atom.horisontal;
+    this.movSpeed = _particle.speed/200;
+    this.movVer = _particle.vertical/100;
+    this.movHor = _particle.horisontal/100;
 
-    this.movScatter = _atom.scatter;
-    this.movRandX = (_atom.perlin**2)/1000000;
-    this.movRandY = (_atom.perlin**2)/1000000;
-    this.movTremble = (_atom.tremble**2)/10000;
+    this.movScatter = _particle.scatter/200;
+    this.movRandX = (_particle.movement**2)/100000; 
+    this.movRandY = (_particle.movement**2)/100000;
+    this.movTremble = (_particle.tremble**2)/10000;
+  }
+  setColor(_color){
+    this.color = _color.hexToHSL(_color.hexColors.randomColor());
   }
 
   gaussianValues(){
@@ -57,24 +62,15 @@ class Atom {
     this.movSpeed = randomGaussian(this.movSpeed, this.movSpeed/2)
   }
 
-  selectType(p1, p2, pTotal){
-    const probability = random(pTotal);
-    let variation = null;
-    if (probability < p1){variation = 'A'}
-    else if (probability < p2){variation = 'B'}
-    else {variation = 'C'}
-    return variation;
-  }
-
   //====MAIN FUNCTIONS
-  particleIsAlive(){
+  particleIsAliveOrResurrected(){
     this.count++;
-    if(this.lifespanIsEternal() || this.count<this.lifespan){
-      return true;
+    if (!this.lifespanIsEternal() && this.count>this.lifespan){
+      this.count=0;
+      this.x = random(0,width);
+      this.y = random(0,height);
     }
-    else{
-      return false
-    }
+
   }
 
   resizeParticle(){
@@ -106,7 +102,7 @@ class Atom {
 
   drawParticle(){
     noStroke()
-    fill(this.color[0], this.color[1], this.color[2])
+    fill(this.color[0], this.color[1], this.color[2], this.opacity)
     ellipse(this.x, this.y, this.size, this.size);
   }
 
@@ -126,7 +122,6 @@ class Atom {
   }
 
   changeSize(size, amplitude, xoff){
-    console.log(size, amplitude, xoff)
     return map(noise(xoff), 0, 1, size-amplitude, size+amplitude);
   }
 

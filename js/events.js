@@ -7,8 +7,11 @@
 // }
 
 function mousePressed() {
-  objScene.quantity++
-  objArr.push(new Atom(mouseX, mouseY, objSettings))
+  objScene.quantity++;
+  if(objSettings.randomValues){
+    objSettings.randomize()
+  }
+  objArr.push(new Particle(mouseX, mouseY, objSettings, objColors))
 }
 
 // function mouseReleased() {
