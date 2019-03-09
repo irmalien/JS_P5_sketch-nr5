@@ -1,10 +1,12 @@
 
 class InitScene {
   constructor(){
+    this.mode = 'random';
     this.globalValues = false;
-    this.quantity = 25;
+    this.quantity = floor(random(50));
     this.clearBackground = () => {
-      background(0)
+      clear();
+      // scene.fillCanvasToScreen();
     }
     this.pausePlay = () => {
       if (scene.looping) {
@@ -17,7 +19,7 @@ class InitScene {
         console.log("played");
       }
     }
-    this.download = () => {
+    this.downloadImage = () => {
       saveCanvas(scene.titleShort, 'png')
     }
     this.updateColors = () => {
@@ -36,6 +38,7 @@ class InitSettings {
     this.lifespanMaxValue = 1000;
     this.size = 5;
     this.sizeVariation = 50;
+    this.roundness = 90;
     this.opacity = 100;
 
     this.speed = 50
@@ -45,9 +48,10 @@ class InitSettings {
     this.tremble = 10;
     this.scatter = 0
     this.randomize = () => {
-      this.lifespan = coinFlip(random(100), random(1000), .7);
-      this.size = coinFlip(random(10), random(50), .9);
+      this.lifespan = coinFlip(random(100), random(100,1000), .7);
+      this.size = coinFlip(random(10), coinFlip(random(10,50), random(50,100), .99), .9 );
       this.sizeVariation = random(100);
+      this.roundness = coinFlip(random(50), random(50,100), .1);
       this.opacity = map(this.size, 100,0,0,100);
       
       this.speed = randomGaussian(30,5);
@@ -68,15 +72,16 @@ function createGUI() {
   objSettings = new InitSettings();
   objColors = new Color(colorsData);
   gui = new dat.GUI();
-  gui.remember(objSettings)
+  // gui.remember(objSettings)
 
   let f0 = gui.addFolder('Scene');
   f0.add(objScene, 'quantity', 0).step(1);
-  f0.add(objScene, 'globalValues');
-  f0.add(objSettings, 'flexibleValues');
-  f0.add(objSettings, 'randomValues');
+  f0.add(objScene, 'mode', [ 'normal', 'random', 'global' ] );
+  // f0.add(objScene, 'globalValues');
+  // f0.add(objSettings, 'flexibleValues');
+  // f0.add(objSettings, 'randomValues');
   f0.add(objScene, 'clearBackground');
-  f0.add(objScene, 'download');
+  f0.add(objScene, 'downloadImage');
   f0.add(objScene, 'pausePlay');
 
   
@@ -85,6 +90,7 @@ function createGUI() {
   f1.add(objSettings, 'lifespan', 1, objSettings.lifespanMaxValue).step(1).listen();
   f1.add(objSettings, 'size', 1, 100).step(1).listen();
   f1.add(objSettings, 'sizeVariation', 0, 100).step(1).listen();
+  f1.add(objSettings, 'roundness', 0, 100).step(1).listen();
   f1.add(objSettings, 'opacity', 0, 100).step(1).listen();
   
   let f2 = gui.addFolder('Dynamics');
@@ -102,6 +108,7 @@ function createGUI() {
   f3.addColor(objColors.hexColors, 'color3').listen();
   f3.addColor(objColors.hexColors, 'color4').listen();
   f3.addColor(objColors.hexColors, 'color5').listen();
+  f3.add(objColors, 'precision', 0,100).listen();
   f3.add(objColors, 'changePalette').listen();
   f3.add(objScene, 'updateColors');
   

@@ -1,32 +1,65 @@
 class Particle {
   constructor(_x, _y, _particle, _color=undefined) {    
     //POSITION
-    this.x = _x;
-    this.y = _y;
-    
+   
+    this.position = {
+      x: _x,
+      y: _y,
+
+      edgeless: (_pos) => {
+        if (_pos.x > width){_pos.x = 0};
+        if (_pos.x < 0){_pos.x = width};
+        if (_pos.y > height){_pos.y = 0};
+        if (_pos.y < 0){_pos.y = height};
+        return _pos
+      }
+    }
+
     //VALUES
+    this.circleParam = {
+      sizeConst: 100,
+      size: 100,
+      sizeRand: 100,
+      roundness: 100,
+      smoothness: 100,
+      amplitude: 0
+
+      // map(this.circleParam.sizeRand, 0, 100, 0, this.circleParam.sizeConst)
+    }
+
     this.setValues(_particle);
     if(this.flexibleValues){
       this.gaussianValues();
     };
-    this.sizeAmplitude = this.setSizeAmplitude(this.sizeConst, this.sizeRand);
 
+    // CIRCLE
+    this.circleObj = new Circle()
 
     //COLOR
+    this.color = {
+      const: null,
+      main: null,
+      amplitude: null,
+    }
     this.setColor(_color);
 
     //PERLIN
-    this.xoffX = random(1000);
-    this.xoffY = random(1000);
-    this.xoffZ = random(1000);
-    this.xoffSize = random(1000);
+    this.perlin = {
+      pos: (function() {
+        let arr = [];
+        for(let i=0; i<100; i++){
+          arr.push(random(10000));
+        }
+        return arr
+      })(),      
+      move: () => {
+
+        // this.position += increment;
+      }
+    }
+
     this.xoffSizeIncrement = random(0.05,0.005);
-    this.xoffCol = random(1000);
-
-    //OBJECT TYPE
-    //TODO solve how to apply in different situations
-    // this.type = this.selectType(0.5, 0.9, 1);
-
+  
     //EXTRAS
     this.count=0
     
@@ -37,9 +70,16 @@ class Particle {
     //OBJECT
     this.flexibleValues = _particle.flexibleValues;
     this.lifespan = _particle.lifespan;
-    this.lifespanMaxValue = _particle.lifespanMaxValue
-    this.sizeConst = (_particle.size**1.1)/2
-    this.sizeRand = _particle.sizeVariation;
+    this.lifespanMaxValue = _particle.lifespanMaxValue;
+    this.deathspan = (_particle.lifespanMaxValue-_particle.lifespan)/10;
+
+    this.circleParam.sizeConst = (_particle.size**1.5)/2;
+    this.circleParam.size = this.circleParam.sizeConst;
+    this.circleParam.sizeRand = _particle.sizeVariation;
+    this.circleParam.roundness = _particle.roundness;
+    this.circleParam.smoothness = this.circleParam.roundness
+    this.circleParam.sizeAmplitude = map(this.circleParam.sizeRand, 0, 100, 0, this.circleParam.sizeConst);
+
     this.opacity = _particle.opacity/100;
 
     //DYNAMICS
@@ -48,17 +88,18 @@ class Particle {
     this.movHor = _particle.horisontal/100;
 
     this.movScatter = _particle.scatter/200;
-    this.movRandX = (_particle.movement**2)/100000; 
-    this.movRandY = (_particle.movement**2)/100000;
+    this.movRandX = (_particle.movement**2)/100000;
+    this.movRandY = this.movRandX
     this.movTremble = (_particle.tremble**2)/10000;
   }
   setColor(_color){
-    this.color = _color.hexToHSL(_color.hexColors.randomColor());
+    this.color.const = _color.hexToHSL(_color.hexColors.randomColor());
+    this.color.main = _color.hexToHSL(_color.hexColors.randomColor());
+    this.color.amplitude = map((_color.precision), 0,100, 50,0)
   }
-
   gaussianValues(){
     this.lifespan = randomGaussian(this.lifespan, this.lifespan/2)
-    this.sizeConst = randomGaussian(this.sizeConst, this.sizeConst/2)
+    this.circleParam.sizeConst = randomGaussian(this.circleParam.sizeConst, this.circleParam.sizeConst/2)
     this.movSpeed = randomGaussian(this.movSpeed, this.movSpeed/2)
   }
 
@@ -67,99 +108,108 @@ class Particle {
     this.count++;
     if (!this.lifespanIsEternal() && this.count>this.lifespan){
       this.count=0;
-      this.x = random(0,width);
-      this.y = random(0,height);
+      this.position.x = random(0,width);
+      this.position.y = random(0,height);
     }
+    
 
   }
 
   resizeParticle(){
-    this.xoffSize += this.xoffSizeIncrement;
-    this.size = this.changeSize(this.sizeConst, this.sizeAmplitude, this.xoffSize);
+    if(this.circleParam.sizeRand<100){
+      this.perlin.pos[3] += this.xoffSizeIncrement;
+      this.circleParam.size = this.changeValueWithAmplitude(this.circleParam.sizeConst, this.perlin.pos[3], this.circleParam.sizeAmplitude)
+    }
   }
 
   moveParticle(){
-    this.xoffX += this.movRandX;
-    this.xoffY += this.movRandY;
-    this.xoffZ += this.movTremble;
-    this.x = this.moveDirection(this.x, this.size, this.movHor)
-    this.y = this.moveDirection(this.y, this.size, this.movVer);
+    // this.perlin.move();
+    if(this.movHor || this.movVer){
+      this.position = this.moveDirection(this.position, this.circleParam.size, this.movHor, this.movVer);
+    }
     if(this.movScatter){
-      this.x = this.moveScatter(this.x, this.size, this.movScatter);
-      this.y = this.moveScatter(this.y, this.size, this.movScatter);
+      this.position = this.moveScatter(this.position, this.circleParam.size, this.movScatter);
     }
     if(this.movTremble){
-      this.x = this.movePerlin(this.x, this.size, -this.movSpeed/5, this.movSpeed/5, this.xoffZ);
-      this.y = this.movePerlin(this.y, this.size, -this.movSpeed/5, this.movSpeed/5, this.xoffZ);
+      this.perlin.pos[0] += this.movTremble;
+      this.position = this.movePerlin(this.position, this.circleParam.size, this.movSpeed/5, this.perlin.pos[0]);
     }
     if(this.movRandX || this.movRandY){
-      this.x = this.movePerlin(this.x, this.size, -this.movSpeed, this.movSpeed, this.xoffX);
-      this.y = this.movePerlin(this.y, this.size, -this.movSpeed, this.movSpeed, this.xoffY);
+      this.perlin.pos[1] += this.movRandX;
+      this.perlin.pos[2] += this.movRandY;
+      this.position = this.movePerlin(this.position, this.circleParam.size, this.movSpeed, this.perlin.pos[1], this.perlin.pos[2]);
     }
+    this.position = this.position.edgeless(this.position);
+  }
 
-    this.edgeless();
+  mirrorValue(_value,_scope){
+    if(_value>_scope){
+      let result = _value-_scope;
+      return result;
+    };
+    if(_value<0){
+      return _value+_scope;
+    }
+    else
+      return _value
   }
 
   drawParticle(){
-    noStroke()
-    fill(this.color[0], this.color[1], this.color[2], this.opacity)
-    ellipse(this.x, this.y, this.size, this.size);
+    noStroke();
+    this.perlin.pos[4]+=0.005;
+    this.color.main[0] = this.changeValueWithAmplitude(this.color.const[0], this.perlin.pos[4], this.color.amplitude);
+    this.color.main[0] = this.mirrorValue(this.color.main[0],360);
+    fill(this.color.main[0], this.color.main[1], this.color.main[2], this.opacity);
+    this.circleObj.draw(this.position, this.circleParam);
+    // ellipse(this.position.x, this.position.y, this.circleParam.size, this.circleParam.size);
   }
 
   //====SUPPORTIVE FUNCTIONS
   lifespanIsEternal() {
-    if(this.lifespan>=this.lifespanMaxValue){
-      return true;
+    return (this.lifespan>=this.lifespanMaxValue) ? true : false;
+  }
+
+  moveDirection(_pos, _size, _valueX, _valueY){
+    _pos.x = _pos.x + (_size * _valueX);
+    _pos.y = _pos.y + (_size * _valueY);
+    return _pos;
+    
+  }
+  moveScatter(_pos, _size, _value){
+    _pos.x = _pos.x + random(-_size*_value, _size*_value);
+    _pos.y = _pos.y + random(-_size*_value, _size*_value);
+    return _pos;
+  }
+
+  movePerlin(_pos, _size, _value, _xoffX, _xoffY){
+    if(_xoffY === undefined){
+      _xoffY=_xoffX;
     }
-    else{
-      return false;
-    }
-  }
-
-  setSizeAmplitude(size, sizeRand){
-    let amplitude = map(sizeRand, 0, 100, 0, size);
-    return amplitude;
-  }
-
-  changeSize(size, amplitude, xoff){
-    return map(noise(xoff), 0, 1, size-amplitude, size+amplitude);
-  }
-
-  moveDirection(pos, radius, value){
-    pos = pos + (radius * value);
-    return pos;
-  }
-  moveScatter(pos, radius, value){
-    pos = pos + random(-radius*value, radius*value);
-    return pos;
-  }
-  movePerlin(pos, radius, x1, x2, xoff){
-    x1 = radius*x1;
-    x2 = radius*x2;
-    pos = pos + map(noise(xoff), 0, 1, x1, x2);
-    return pos;
+    _pos.x = _pos.x + map(noise(_xoffX), 0, 1, _size*-_value, _size*_value);
+    _pos.y = _pos.y + map(noise(_xoffY), 0, 1, _size*-_value, _size*_value);
+    return _pos;
   };
 
-  edgeless(){
-    if (this.x > width){this.x = 0};
-    if (this.x < 0){this.x = width};
-    if (this.y > height){this.y = 0};
-    if (this.y < 0){this.y = height};
+  changeValueWithAmplitude(_constant, _perlin, _amplitude){
+    let min = _constant-_amplitude;
+    let max = _constant+_amplitude;
+    return floor(map(noise(_perlin), 0, 1, min, max));
   }
 
+  //====UNUSED 
   mirrorX(){
     let x2;
     let fullSize = width;
     let halfSize = width;
     let remainSize = fullSize-halfSize;
 
-    if (this.x > halfSize){this.x = 0};
-    if (this.x < 0){this.x = halfSize};
-    if (this.y > height){this.y = 0};
-    if (this.y < 0){this.y = height};
-    this.show(this.x, this.y);
-    x2 = map(this.x, 0, halfSize, fullSize, remainSize);
-    this.show(x2, this.y);
+    if (this.position.x > halfSize){this.position.x = 0};
+    if (this.position.x < 0){this.position.x = halfSize};
+    if (this.position.y > height){this.position.y = 0};
+    if (this.position.y < 0){this.position.y = height};
+    this.show(this.position.x, this.position.y);
+    x2 = map(this.position.x, 0, halfSize, fullSize, remainSize);
+    this.show(x2, this.position.y);
   }
 
   mirrorXY(){
@@ -172,16 +222,16 @@ class Particle {
     let halfY = height;
     let remY = fullY-halfY;
 
-    if (this.x > halfX){this.x = 0};
-    if (this.x < 0){this.x = halfX};
-    if (this.y > halfY){this.y = 0};
-    if (this.y < 0){this.y = halfY};
-    x2 = map(this.x, 0, fullX, halfX, remX);
-    y2 = map(this.y, 0, fullY, halfY, remY);
+    if (this.position.x > halfX){this.position.x = 0};
+    if (this.position.x < 0){this.position.x = halfX};
+    if (this.position.y > halfY){this.position.y = 0};
+    if (this.position.y < 0){this.position.y = halfY};
+    x2 = map(this.position.x, 0, fullX, halfX, remX);
+    y2 = map(this.position.y, 0, fullY, halfY, remY);
 
-    this.show(this.x, this.y);
-    this.show(x2, this.y);
-    this.show(this.x, y2);
+    this.show(this.position.x, this.position.y);
+    this.show(x2, this.position.y);
+    this.show(this.position.x, y2);
     this.show(x2, y2);
 
   }

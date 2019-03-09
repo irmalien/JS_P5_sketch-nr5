@@ -6,13 +6,14 @@
 //   redraw();
 // }
 
-function mousePressed() {
-  objScene.quantity++;
-  if(objSettings.randomValues){
-    objSettings.randomize()
-  }
-  objArr.push(new Particle(mouseX, mouseY, objSettings, objColors))
-}
+
+// function mousePressed() {
+//   objScene.quantity++;
+//   if(objScene.mode==='random'){
+//     objSettings.randomize()
+//   }
+//   objArr.push(new Particle(mouseX, mouseY, objSettings, objColors))
+// }
 
 // function mouseReleased() {
 //   for(i = objArr.length-1; i >= 0; i-- ){

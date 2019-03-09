@@ -1,15 +1,12 @@
 
-let quantity = 2;
 const objArr = []
 let gui;
 let colorsData;
+let counter = 0;
 
 function preload(){
   colorsData = loadJSON("data/palettes.json");
-
 }
-
-
 
 function setup() {
   scene.canvas = createCanvas(scene.canvasWidth, scene.canvasHeight);
@@ -19,14 +16,22 @@ function setup() {
   colorMode(HSL, 360,100,100);
   createGUI()
   // window.addEventListener('resize', scene.fillCanvasToScreen, false);
-  scene.fillCanvasToScreen();
-}
+  // scene.fillCanvasToScreen();
 
+  document.getElementById("canvasId").addEventListener('click', function (event) {
+    objScene.quantity++;
+    if(objScene.mode==='random'){
+      objSettings.randomize()
+    }
+    objArr.push(new Particle(mouseX, mouseY, objSettings, objColors))
+    console.log(event, "received")
+  }, false);
+}
 
 function draw() {
   // add objects
   if(objArr.length<objScene.quantity){
-    if(objSettings.randomValues){
+    if(objScene.mode==='random'){
       objSettings.randomize()
     }
     objArr.push(new Particle(random(width), random(height), objSettings, objColors))
@@ -38,11 +43,13 @@ function draw() {
   }
 
   // set values for all objects or for last object
-  if(objScene.globalValues){
+  if(objScene.mode==='global'){
     for(let i = objArr.length-1; i >= 0; i-- ){
       objArr[i].setValues(objSettings)
     }
   }
+
+
 
   //move and draw
   for(let i = objArr.length-1; i >= 0; i-- ){
@@ -52,5 +59,15 @@ function draw() {
     objArr[i].drawParticle();
   }
 
+  //autoDownload
+  counter++
+  if(counter===1000 || counter===10000 || counter===20000 || counter===50000){
+    saveCanvas(this.titleShort, 'png');
+    console.log("saved", counter)
+  };
+  if(counter===51000){
+    location.reload();
+    console.log("reload")
+  }
 }
 

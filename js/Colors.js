@@ -21,6 +21,7 @@ class Color {
         else if(randomValue<5){return this.color5;}
       }
     }
+    this.precision = 50;
   }
 
   processColorPallete(){
