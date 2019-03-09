@@ -25,4 +25,7 @@ class Circle {
     endShape(CLOSE);
     pop();
   }
+  set newZoff(_value){
+    this.zoff = _value
+  }
 }

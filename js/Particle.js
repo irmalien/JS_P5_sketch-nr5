@@ -27,14 +27,14 @@ class Particle {
       // map(this.circleParam.sizeRand, 0, 100, 0, this.circleParam.sizeConst)
     }
     this.alive=true;
-
     this.setValues(_particle);
-    if(this.flexibleValues){
-      this.gaussianValues();
-    };
+
 
     // CIRCLE
     this.circleObj = new Circle()
+
+    this.gaussianValues();
+
 
     //COLOR
     this.color = {
@@ -100,9 +100,10 @@ class Particle {
     this.color.amplitude = map((_color.precision), 0,100, 50,0)
   }
   gaussianValues(){
-    this.lifespan = randomGaussian(this.lifespan, this.lifespan/2)
-    this.circleParam.sizeConst = randomGaussian(this.circleParam.sizeConst, this.circleParam.sizeConst/2)
-    this.movSpeed = randomGaussian(this.movSpeed, this.movSpeed/2)
+    this.lifespan = randomGaussian(this.lifespan, this.lifespan/2);
+    this.circleParam.sizeConst = randomGaussian(this.circleParam.sizeConst, this.circleParam.sizeConst/2);
+    this.movSpeed = randomGaussian(this.movSpeed, this.movSpeed/2);
+    this.circleObj.newZoff = random(1000);
   }
 
   //====MAIN FUNCTIONS
@@ -119,6 +120,7 @@ class Particle {
         this.count=0;
         this.position.x = random(0,width);
         this.position.y = random(0,height);
+        this.gaussianValues();
       }
 
     }
@@ -172,9 +174,9 @@ class Particle {
 
     newColor[0] = this.changeValueWithAmplitude(_const[0], _perlin[4], _amplitude);
     newColor[0] = this.mirrorValue(this.color.main[0],360);
-    newColor[1] = this.changeValueWithAmplitude(_const[1], _perlin[5], _amplitude);
+    newColor[1] = this.changeValueWithAmplitude(_const[1], _perlin[5], _amplitude/3);
     newColor[1] = this.limitValue(newColor[1],100);
-    newColor[2] = this.changeValueWithAmplitude(_const[2], _perlin[6], _amplitude);
+    newColor[2] = this.changeValueWithAmplitude(_const[2], _perlin[6], _amplitude/3);
     newColor[2] = this.limitValue(newColor[2],100);
     return newColor;
   }

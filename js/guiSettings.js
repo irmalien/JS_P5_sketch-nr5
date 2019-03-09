@@ -3,7 +3,7 @@ class InitScene {
   constructor(){
     this.mode = 'random';
     this.globalValues = false;
-    this.quantity = floor(random(50));
+    this.quantity = floor(random(5,50));
     this.clearBackground = () => {
       clear();
       // scene.fillCanvasToScreen();
