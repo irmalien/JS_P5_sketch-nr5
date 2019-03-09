@@ -24,7 +24,6 @@ function setup() {
       objSettings.randomize()
     }
     objArr.push(new Particle(mouseX, mouseY, objSettings, objColors))
-    console.log(event, "received")
   }, false);
 }
 
@@ -60,14 +59,14 @@ function draw() {
   }
 
   //autoDownload
-  counter++
-  if(counter===1000 || counter===10000 || counter===20000 || counter===50000){
-    saveCanvas(this.titleShort, 'png');
-    console.log("saved", counter)
-  };
-  if(counter===51000){
-    location.reload();
-    console.log("reload")
-  }
+  // counter++
+  // if(counter===1000 || counter===5000 || counter===10000 || counter===20000){
+  //   saveCanvas(this.titleShort, 'png');
+  //   console.log("saved", counter)
+  // };
+  // if(counter===21000){
+  //   location.reload();
+  //   console.log("reload")
+  // }
 }
 

@@ -26,6 +26,7 @@ class Particle {
 
       // map(this.circleParam.sizeRand, 0, 100, 0, this.circleParam.sizeConst)
     }
+    this.alive=true;
 
     this.setValues(_particle);
     if(this.flexibleValues){
@@ -73,7 +74,8 @@ class Particle {
     this.lifespanMaxValue = _particle.lifespanMaxValue;
     this.deathspan = (_particle.lifespanMaxValue-_particle.lifespan)/10;
 
-    this.circleParam.sizeConst = (_particle.size**1.5)/2;
+    let relativeSize = 1+(width*0.0001);
+    this.circleParam.sizeConst = (_particle.size**relativeSize)/2;
     this.circleParam.size = this.circleParam.sizeConst;
     this.circleParam.sizeRand = _particle.sizeVariation;
     this.circleParam.roundness = _particle.roundness;
@@ -106,12 +108,21 @@ class Particle {
   //====MAIN FUNCTIONS
   particleIsAliveOrResurrected(){
     this.count++;
-    if (!this.lifespanIsEternal() && this.count>this.lifespan){
-      this.count=0;
-      this.position.x = random(0,width);
-      this.position.y = random(0,height);
+    let lifespanIsEternal = (this.lifespan>=this.lifespanMaxValue) ? true : false;
+
+    //kill particle
+    if (!lifespanIsEternal && this.count>this.lifespan){
+      this.alive=false;
+      //ressurect
+      if(this.count>this.lifespan+this.deathspan){
+        this.alive=true;
+        this.count=0;
+        this.position.x = random(0,width);
+        this.position.y = random(0,height);
+      }
+
     }
-    
+
 
   }
 
@@ -142,6 +153,33 @@ class Particle {
     this.position = this.position.edgeless(this.position);
   }
 
+
+  drawParticle(){
+    if(this.alive){
+      this.color.main = this.perlinColor(this.color.const, this.perlin.pos, this.color.amplitude);
+      noStroke();
+      fill(this.color.main[0], this.color.main[1], this.color.main[2], this.opacity);
+      this.circleObj.draw(this.position, this.circleParam);
+      // ellipse(this.position.x, this.position.y, this.circleParam.size, this.circleParam.size);
+    }
+  }
+
+  perlinColor(_const, _perlin, _amplitude){
+    let newColor = [];
+    _perlin[4]+=0.001;
+    _perlin[5]+=0.001;
+    _perlin[6]+=0.001;
+
+    newColor[0] = this.changeValueWithAmplitude(_const[0], _perlin[4], _amplitude);
+    newColor[0] = this.mirrorValue(this.color.main[0],360);
+    newColor[1] = this.changeValueWithAmplitude(_const[1], _perlin[5], _amplitude);
+    newColor[1] = this.limitValue(newColor[1],100);
+    newColor[2] = this.changeValueWithAmplitude(_const[2], _perlin[6], _amplitude);
+    newColor[2] = this.limitValue(newColor[2],100);
+    return newColor;
+  }
+
+  //====SUPPORTIVE FUNCTIONS
   mirrorValue(_value,_scope){
     if(_value>_scope){
       let result = _value-_scope;
@@ -152,21 +190,18 @@ class Particle {
     }
     else
       return _value
-  }
+  };
 
-  drawParticle(){
-    noStroke();
-    this.perlin.pos[4]+=0.005;
-    this.color.main[0] = this.changeValueWithAmplitude(this.color.const[0], this.perlin.pos[4], this.color.amplitude);
-    this.color.main[0] = this.mirrorValue(this.color.main[0],360);
-    fill(this.color.main[0], this.color.main[1], this.color.main[2], this.opacity);
-    this.circleObj.draw(this.position, this.circleParam);
-    // ellipse(this.position.x, this.position.y, this.circleParam.size, this.circleParam.size);
-  }
-
-  //====SUPPORTIVE FUNCTIONS
-  lifespanIsEternal() {
-    return (this.lifespan>=this.lifespanMaxValue) ? true : false;
+  limitValue(_value,_limit){
+    if (_value>_limit){
+      return _limit;
+    }
+    else if (_value<0){
+      return 0;
+    }
+    else {
+      return _value
+    }
   }
 
   moveDirection(_pos, _size, _valueX, _valueY){

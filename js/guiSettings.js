@@ -49,7 +49,7 @@ class InitSettings {
     this.scatter = 0
     this.randomize = () => {
       this.lifespan = coinFlip(random(100), random(100,1000), .7);
-      this.size = coinFlip(random(10), coinFlip(random(10,50), random(50,100), .99), .9 );
+      this.size = coinFlip(random(10), coinFlip(random(10,40), random(40,100), .95), .95);
       this.sizeVariation = random(100);
       this.roundness = coinFlip(random(50), random(50,100), .1);
       this.opacity = map(this.size, 100,0,0,100);
@@ -111,7 +111,7 @@ function createGUI() {
   f3.add(objColors, 'precision', 0,100).listen();
   f3.add(objColors, 'changePalette').listen();
   f3.add(objScene, 'updateColors');
-  
+  f0.open();
   f1.open();
   f2.open();
 };
