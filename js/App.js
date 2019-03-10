@@ -20,7 +20,7 @@ function setup() {
 
   document.getElementById("canvasId").addEventListener('click', function (event) {
     objScene.quantity++;
-    if(objScene.mode==='random'){
+    if(objSettings.mode==='random'){
       objSettings.randomize()
     }
     objArr.push(new Particle(mouseX, mouseY, objSettings, objColors))
@@ -30,7 +30,7 @@ function setup() {
 function draw() {
   // add objects
   if(objArr.length<objScene.quantity){
-    if(objScene.mode==='random'){
+    if(objSettings.mode==='random'){
       objSettings.randomize()
     }
     objArr.push(new Particle(random(width), random(height), objSettings, objColors))
@@ -42,7 +42,7 @@ function draw() {
   }
 
   // set values for all objects or for last object
-  if(objScene.mode==='global'){
+  if(objSettings.mode==='global'){
     for(let i = objArr.length-1; i >= 0; i-- ){
       objArr[i].setValues(objSettings)
     }
@@ -59,14 +59,14 @@ function draw() {
   }
 
   //autoDownload
-  // counter++
-  // if(counter===1000 || counter===5000 || counter===10000 || counter===20000){
-  //   saveCanvas(this.titleShort, 'png');
-  //   console.log("saved", counter)
-  // };
-  // if(counter===21000){
-  //   location.reload();
-  //   console.log("reload")
-  // }
+  counter++
+  if(counter===1000 || counter===2500 || counter===5000 || counter===10000){
+    saveCanvas(this.titleShort, 'png');
+    console.log("saved", counter)
+  };
+  if(counter===10500){
+    location.reload();
+    console.log("reload")
+  }
 }
 

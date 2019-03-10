@@ -1,8 +1,6 @@
 
 class InitScene {
   constructor(){
-    this.mode = 'random';
-    this.globalValues = false;
     this.quantity = floor(random(5,50));
     this.clearBackground = () => {
       clear();
@@ -32,6 +30,7 @@ class InitScene {
 
 class InitSettings {
   constructor(){
+    this.mode = 'random';
     this.flexibleValues = true;
     this.randomValues = true;
     this.lifespan = 500;
@@ -76,7 +75,7 @@ function createGUI() {
 
   let f0 = gui.addFolder('Scene');
   f0.add(objScene, 'quantity', 0).step(1);
-  f0.add(objScene, 'mode', [ 'normal', 'random', 'global' ] );
+  f0.add(objSettings, 'mode', [ 'normal', 'random', 'global' ] );
   // f0.add(objScene, 'globalValues');
   // f0.add(objSettings, 'flexibleValues');
   // f0.add(objSettings, 'randomValues');

@@ -28,13 +28,12 @@ class Particle {
     }
     this.alive=true;
     this.setValues(_particle);
-
+    this.randomnessConst = 1.5;
 
     // CIRCLE
     this.circleObj = new Circle()
 
     this.gaussianValues();
-
 
     //COLOR
     this.color = {
@@ -69,6 +68,7 @@ class Particle {
   //====INITIALIZE===================
   setValues(_particle){
     //OBJECT
+    this.mode =_particle.mode;
     this.flexibleValues = _particle.flexibleValues;
     this.lifespan = _particle.lifespan;
     this.lifespanMaxValue = _particle.lifespanMaxValue;
@@ -100,9 +100,9 @@ class Particle {
     this.color.amplitude = map((_color.precision), 0,100, 50,0)
   }
   gaussianValues(){
-    this.lifespan = randomGaussian(this.lifespan, this.lifespan/2);
-    this.circleParam.sizeConst = randomGaussian(this.circleParam.sizeConst, this.circleParam.sizeConst/2);
-    this.movSpeed = randomGaussian(this.movSpeed, this.movSpeed/2);
+    this.lifespan = randomGaussian(this.lifespan, this.lifespan/this.randomnessConst);
+    this.circleParam.sizeConst = randomGaussian(this.circleParam.sizeConst, this.circleParam.sizeConst/this.randomnessConst);
+    this.movSpeed = randomGaussian(this.movSpeed, this.movSpeed/this.randomnessConst);
     this.circleObj.newZoff = random(1000);
   }
 
@@ -120,7 +120,12 @@ class Particle {
         this.count=0;
         this.position.x = random(0,width);
         this.position.y = random(0,height);
-        this.gaussianValues();
+        if(this.mode==="random"){
+          this.gaussianValues();
+        }
+        else{
+          this.circleObj.newZoff = random(1000);
+        }
       }
 
     }
