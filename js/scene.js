@@ -1,28 +1,59 @@
-const scene = {
-  titleFull: "nr5",
-  titleShort: "nr5",
-  canvas: null,
-  relativeSize: 16,
-  // canvasWidth: document.documentElement.clientWidth,
-  // canvasHeight: document.documentElement.clientHeight,
-  canvasWidth: 4400,
-  canvasHeight: 2616,
-  color: [0,0,0],
-  alfa: 1,
-  looping: true,
-  countDraw: 0,
-  fps: 60,
-  temporalFps: this.fps,
-  trailing: 1,
-  mode: false,
+class SceneClass {
+  constructor() { 
+    this.titleFull = "nr5",
+    this.titleShort = "nr5",
+    // canvasWidth: document.documentElement.clientWidth,
+    // canvasHeight: document.documentElement.clientHeight,
+    this.width = 4400,
+    this.height = 2616,
+    this.quality = 'good',
+    this.canvas = createCanvas(this.width, this.height),
+    this.canvas.class("canvasClass");
+    this.canvas.id("canvasId");
+    this.background = [0,0,0];
 
-  wrapCanvas (id) {
+
+    //PLAY
+    this.playLoop = true,
+    this.playCount = 0,
+    this.fps = 60,
+    
+    //OBJECTS in scene
+    this.quantity = floor(random(10,50));
+
+    //CALL METHODS
+    this.clearBackground = () => {
+      clear(); 
+      this.resizeCanvasQuality(scene.quality)
+      this.fitCanvasToScreen();
+    }
+    this.pausePlay = () => {
+      if (this.playLoop) {
+        noLoop()
+        this.playLoop = false;
+        console.log("paused");
+      } else {
+        loop()
+        this.playLoop = true;
+        console.log("played");
+      }
+    }
+    this.downloadImage = () => {
+      saveCanvas(scene.titleShort, 'png')
+    }
+
+    //INIT METHODS
+    this.wrapCanvasInDIV(this.canvas.canvas.id, this.background);
+
+  }
+
+  wrapCanvasInDIV (_canvasId, _divColor) {
     const canvasWrapper = document.createElement('div');
-    canvasWrapper.style.cssText = `position:absolute;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:hsl(${scene.color[0]}, ${scene.color[1]}%, ${scene.color[2]}%);`;
+    canvasWrapper.style.cssText = `position:absolute;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:hsl(${_divColor[0]}, ${_divColor[1]}%, ${_divColor[2]}%);`;
     document.body.appendChild(canvasWrapper);
-    canvasWrapper.appendChild(document.getElementById(id));
-  },
-  
+    canvasWrapper.appendChild(document.getElementById(_canvasId));
+  }
+
   fitCanvasToScreen() {
     let c = document.getElementsByTagName('canvas');
     let px = /px/;
@@ -46,53 +77,18 @@ const scene = {
         c[i].style.height = `${h}px`;
       }
     }
-  },
-
-  fillCanvasToScreen(){
-    resizeCanvas(document.documentElement.clientWidth, document.documentElement.clientHeight);
-  },
-
-  download(counter, totalImages =100, everyNth = 1){
-    totalImages = totalImages*everyNth;
-    if(counter < totalImages & counter%everyNth===0){
-      saveCanvas(this.titleShort, 'png');
-    }
-  },
-  
-  reloadPage(counter, reloadOnFrame){
-    if(counter > reloadOnFrame){
-      location.reload();
-    }
-  },
-
-  pauseFps(msec){
-    setTimeout(() => {
-      this.fps = 20;
-
-    }, msec);
-    this.fps = 1;
-  },
-
-  pause(msec){
-    setTimeout(() => {
-      loop()
-    }, msec);
-    noLoop()
-  },
-
-  fadeIn(frames=300){
-    if(scene.alfa>=0){
-      let step = 1/frames
-      scene.alfa=scene.alfa-step;
-      background(scene.color[0],scene.color[1],scene.color[2], scene.alfa);
-    }
-  },
-
-  fadeOut(frames){
-    if(scene.alfa<=1){
-      let step = 1/frames
-      scene.alfa=scene.alfa+step;
-      background(scene.color[0],scene.color[1],scene.color[2], scene.alfa);
-    }
   }
+
+  resizeCanvasToScreen(){
+    resizeCanvas(document.documentElement.clientWidth, document.documentElement.clientHeight);
+  }
+
+  resizeCanvasQuality(_quality){
+    let multiplier;
+    if(_quality === 'great'){multiplier=4}
+    else if(_quality === 'good'){multiplier=2}
+    else{multiplier=1};
+    resizeCanvas(document.documentElement.clientWidth*multiplier, document.documentElement.clientHeight*multiplier);
+  }
+
 }

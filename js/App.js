@@ -1,70 +1,81 @@
 
-const objArr = []
+let scene;
 let gui;
+const particleArr = []
 let colorsData;
-let counter = 0;
+
 
 function preload(){
   colorsData = loadJSON("data/palettes.json");
 }
 
 function setup() {
-  scene.canvas = createCanvas(scene.canvasWidth, scene.canvasHeight);
-  scene.canvas.class("canvasClass");
-  scene.canvas.id("canvasId");
-  scene.wrapCanvas("canvasId");
+  scene = new SceneClass();
+  particleSettings = new ParticleSettings();
+  colorScheme = new ColorScheme(colorsData);
+  gui = new dat.GUI();
+  
   colorMode(HSL, 360,100,100);
-  createGUI()
-  // window.addEventListener('resize', scene.fillCanvasToScreen, false);
-  // scene.fillCanvasToScreen();
-
-  document.getElementById("canvasId").addEventListener('click', function (event) {
-    objScene.quantity++;
-    if(objSettings.mode==='random'){
-      objSettings.randomize()
+  createGUI();
+  window.addEventListener('resize', scene.fitCanvasToScreen, false);
+  scene.canvas.canvas.addEventListener('click', function (event) {
+    scene.quantity++;
+    if(particleSettings.mode==='random'){
+      particleSettings.randomize();
+      colorScheme.randomize();
     }
-    objArr.push(new Particle(mouseX, mouseY, objSettings, objColors))
+    particleArr.push(new Particle(mouseX, mouseY, particleSettings, colorScheme))
   }, false);
+  scene.resizeCanvasQuality(scene.quality);
+  scene.fitCanvasToScreen();
 }
 
 function draw() {
   // add objects
-  if(objArr.length<objScene.quantity){
-    if(objSettings.mode==='random'){
-      objSettings.randomize()
+  if(particleArr.length<scene.quantity){
+    if(particleSettings.mode==='random'){
+      particleSettings.randomize()
+      colorScheme.randomize()
     }
-    objArr.push(new Particle(random(width), random(height), objSettings, objColors))
+    particleArr.push(new Particle(random(width), random(height), particleSettings, colorScheme))
   }
 
   // remove objects
-  if(objArr.length>objScene.quantity){
-    objArr.splice(0, 1);
+  if(particleArr.length>scene.quantity){
+    particleArr.splice(0, 1);
+  }
+  for(let i = particleArr.length-1; i >= 0; i-- ){
+    if(particleArr[i].dead){
+      particleArr.splice(i, 1);
+      scene.quantity = coinFlip(scene.quantity-1,  scene.quantity+2, 0.8)
+    }
   }
 
   // set values for all objects or for last object
-  if(objSettings.mode==='global'){
-    for(let i = objArr.length-1; i >= 0; i-- ){
-      objArr[i].setValues(objSettings)
+  if(particleSettings.mode==='global'){
+    for(let i = particleArr.length-1; i >= 0; i-- ){
+      particleArr[i].setValues(particleSettings)
+
     }
   }
 
 
 
   //move and draw
-  for(let i = objArr.length-1; i >= 0; i-- ){
-    objArr[i].particleIsAliveOrResurrected();
-    objArr[i].resizeParticle();
-    objArr[i].moveParticle();
-    objArr[i].drawParticle();
+  for(let i = particleArr.length-1; i >= 0; i-- ){
+    particleArr[i].particleIsAliveOrResurrected();
+    particleArr[i].resizeParticle();
+    particleArr[i].moveParticle();
+    particleArr[i].drawParticle();
   }
 
   //autoDownload
-  counter++
-  if(counter===1000 || counter===2500 || counter===5000 || counter===10000){
-    saveCanvas(this.titleShort, 'png');
-    console.log("saved", counter)
+  scene.playCount++
+  if(scene.playCount===1000 || scene.playCount===2500 || scene.playCount===5000 || scene.playCount===10000){
+    saveCanvas(scene.titleShort, 'png');
+    console.log("saved", scene.playCount)
   };
-  if(counter===10500){
+  if(scene.playCount===10500){
     location.reload();
     console.log("reload")
   }

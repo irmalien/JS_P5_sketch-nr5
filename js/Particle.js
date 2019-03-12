@@ -1,7 +1,6 @@
 class Particle {
   constructor(_x, _y, _particle, _color=undefined) {    
-    //POSITION
-   
+    //POSITION default values
     this.position = {
       x: _x,
       y: _y,
@@ -15,53 +14,31 @@ class Particle {
       }
     }
 
-    //VALUES
-    this.circleParam = {
-      sizeConst: 100,
-      size: 100,
-      sizeRand: 100,
-      roundness: 100,
-      smoothness: 100,
-      amplitude: 0
-
-      // map(this.circleParam.sizeRand, 0, 100, 0, this.circleParam.sizeConst)
-    }
-    this.alive=true;
-    this.setValues(_particle);
-    this.randomnessConst = 1.5;
-
-    // CIRCLE
-    this.circleObj = new Circle()
-
-    this.gaussianValues();
+    //CIRCLE default values
+    this.circleSettings = {}
 
     //COLOR
-    this.color = {
-      const: null,
-      main: null,
-      amplitude: null,
-    }
-    this.setColor(_color);
+    this.color=new Color(_color);
 
     //PERLIN
-    this.perlin = {
-      pos: (function() {
-        let arr = [];
-        for(let i=0; i<100; i++){
-          arr.push(random(10000));
-        }
-        return arr
-      })(),      
-      move: () => {
-
-        // this.position += increment;
-      }
-    }
+    this.perlin = generatePerlinArr()
 
     this.xoffSizeIncrement = random(0.05,0.005);
-  
+    this.randomnessConst = 2;
+
+    // OBJECTS
+    this.circleObj = new Circle()
+
+    //FUNCTIONS
+    this.setValues(_particle);
+    this.setColor(_color);
+    this.gaussianValues();
+
+
     //EXTRAS
-    this.count=0
+    this.count=0;
+    this.alive=true;
+    this.dead=false;
     
   }
 
@@ -75,14 +52,12 @@ class Particle {
     this.deathspan = (_particle.lifespanMaxValue-_particle.lifespan)/10;
 
     let relativeSize = 1+(width*0.0001);
-    this.circleParam.sizeConst = (_particle.size**relativeSize)/2;
-    this.circleParam.size = this.circleParam.sizeConst;
-    this.circleParam.sizeRand = _particle.sizeVariation;
-    this.circleParam.roundness = _particle.roundness;
-    this.circleParam.smoothness = this.circleParam.roundness
-    this.circleParam.sizeAmplitude = map(this.circleParam.sizeRand, 0, 100, 0, this.circleParam.sizeConst);
-
-    this.opacity = _particle.opacity/100;
+    this.circleSettings.sizeConst = (_particle.size**relativeSize)/2;
+    this.circleSettings.size = this.circleSettings.sizeConst;
+    this.circleSettings.sizeRand = _particle.sizeVariation;
+    this.circleSettings.roundness = _particle.roundness;
+    this.circleSettings.smoothness = this.circleSettings.roundness
+    this.circleSettings.sizeAmplitude = map(this.circleSettings.sizeRand, 0, 100, 0, this.circleSettings.sizeConst);
 
     //DYNAMICS
     this.movSpeed = _particle.speed/200;
@@ -95,13 +70,12 @@ class Particle {
     this.movTremble = (_particle.tremble**2)/10000;
   }
   setColor(_color){
-    this.color.const = _color.hexToHSL(_color.hexColors.randomColor());
-    this.color.main = _color.hexToHSL(_color.hexColors.randomColor());
-    this.color.amplitude = map((_color.precision), 0,100, 50,0)
+    this.color.new = _color;
   }
+
   gaussianValues(){
     this.lifespan = randomGaussian(this.lifespan, this.lifespan/this.randomnessConst);
-    this.circleParam.sizeConst = randomGaussian(this.circleParam.sizeConst, this.circleParam.sizeConst/this.randomnessConst);
+    this.circleSettings.sizeConst = randomGaussian(this.circleSettings.sizeConst, this.circleSettings.sizeConst/this.randomnessConst);
     this.movSpeed = randomGaussian(this.movSpeed, this.movSpeed/this.randomnessConst);
     this.circleObj.newZoff = random(1000);
   }
@@ -114,6 +88,11 @@ class Particle {
     //kill particle
     if (!lifespanIsEternal && this.count>this.lifespan){
       this.alive=false;
+      //remove particle from array
+      if (this.lifespan < 0 || this.circleSettings.sizeConst < 0 || this.movSpeed < 0){
+        this.dead = true;
+        // console.log("Remove particle", this.lifespan, this.circleSettings.sizeConst, this.movSpeed)
+      }
       //ressurect
       if(this.count>this.lifespan+this.deathspan){
         this.alive=true;
@@ -134,28 +113,28 @@ class Particle {
   }
 
   resizeParticle(){
-    if(this.circleParam.sizeRand<100){
-      this.perlin.pos[3] += this.xoffSizeIncrement;
-      this.circleParam.size = this.changeValueWithAmplitude(this.circleParam.sizeConst, this.perlin.pos[3], this.circleParam.sizeAmplitude)
+    if(this.circleSettings.sizeRand<100){
+      this.perlin[3] += this.xoffSizeIncrement;
+      this.circleSettings.size = changeValueWithAmplitude(this.circleSettings.sizeConst, this.perlin[3], this.circleSettings.sizeAmplitude)
     }
   }
 
   moveParticle(){
     // this.perlin.move();
     if(this.movHor || this.movVer){
-      this.position = this.moveDirection(this.position, this.circleParam.size, this.movHor, this.movVer);
+      this.position = this.moveDirection(this.position, this.circleSettings.size, this.movHor, this.movVer);
     }
     if(this.movScatter){
-      this.position = this.moveScatter(this.position, this.circleParam.size, this.movScatter);
+      this.position = this.moveScatter(this.position, this.circleSettings.size, this.movScatter);
     }
     if(this.movTremble){
-      this.perlin.pos[0] += this.movTremble;
-      this.position = this.movePerlin(this.position, this.circleParam.size, this.movSpeed/5, this.perlin.pos[0]);
+      this.perlin[0] += this.movTremble;
+      this.position = this.movePerlin(this.position, this.circleSettings.size, this.movSpeed/5, this.perlin[0]);
     }
     if(this.movRandX || this.movRandY){
-      this.perlin.pos[1] += this.movRandX;
-      this.perlin.pos[2] += this.movRandY;
-      this.position = this.movePerlin(this.position, this.circleParam.size, this.movSpeed, this.perlin.pos[1], this.perlin.pos[2]);
+      this.perlin[1] += this.movRandX;
+      this.perlin[2] += this.movRandY;
+      this.position = this.movePerlin(this.position, this.circleSettings.size, this.movSpeed, this.perlin[1], this.perlin[2]);
     }
     this.position = this.position.edgeless(this.position);
   }
@@ -163,54 +142,15 @@ class Particle {
 
   drawParticle(){
     if(this.alive){
-      this.color.main = this.perlinColor(this.color.const, this.perlin.pos, this.color.amplitude);
       noStroke();
-      fill(this.color.main[0], this.color.main[1], this.color.main[2], this.opacity);
-      this.circleObj.draw(this.position, this.circleParam);
-      // ellipse(this.position.x, this.position.y, this.circleParam.size, this.circleParam.size);
+      fill(this.color.perlin[0], this.color.perlin[1], this.color.perlin[2], this.color.opacity);
+      
+      this.circleObj.draw(this.position, this.circleSettings);
     }
   }
 
-  perlinColor(_const, _perlin, _amplitude){
-    let newColor = [];
-    _perlin[4]+=0.001;
-    _perlin[5]+=0.001;
-    _perlin[6]+=0.001;
-
-    newColor[0] = this.changeValueWithAmplitude(_const[0], _perlin[4], _amplitude);
-    newColor[0] = this.mirrorValue(this.color.main[0],360);
-    newColor[1] = this.changeValueWithAmplitude(_const[1], _perlin[5], _amplitude/3);
-    newColor[1] = this.limitValue(newColor[1],100);
-    newColor[2] = this.changeValueWithAmplitude(_const[2], _perlin[6], _amplitude/3);
-    newColor[2] = this.limitValue(newColor[2],100);
-    return newColor;
-  }
 
   //====SUPPORTIVE FUNCTIONS
-  mirrorValue(_value,_scope){
-    if(_value>_scope){
-      let result = _value-_scope;
-      return result;
-    };
-    if(_value<0){
-      return _value+_scope;
-    }
-    else
-      return _value
-  };
-
-  limitValue(_value,_limit){
-    if (_value>_limit){
-      return _limit;
-    }
-    else if (_value<0){
-      return 0;
-    }
-    else {
-      return _value
-    }
-  }
-
   moveDirection(_pos, _size, _valueX, _valueY){
     _pos.x = _pos.x + (_size * _valueX);
     _pos.y = _pos.y + (_size * _valueY);
@@ -231,12 +171,6 @@ class Particle {
     _pos.y = _pos.y + map(noise(_xoffY), 0, 1, _size*-_value, _size*_value);
     return _pos;
   };
-
-  changeValueWithAmplitude(_constant, _perlin, _amplitude){
-    let min = _constant-_amplitude;
-    let max = _constant+_amplitude;
-    return floor(map(noise(_perlin), 0, 1, min, max));
-  }
 
   //====UNUSED 
   mirrorX(){

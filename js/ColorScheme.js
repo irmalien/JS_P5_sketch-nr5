@@ -1,10 +1,10 @@
-class Color {
+class ColorScheme {
   constructor(data) {
     this.colorsData = data;
     this.colorArray = [];
     this.selectedPalleteId;
     this.changePalette = () => {
-      this.processColorPallete() 
+      this.processColorScheme() 
     }
     this.hexColors = {
       color1:null,
@@ -20,25 +20,38 @@ class Color {
         else if(randomValue<4){return this.color4;}
         else if(randomValue<5){return this.color5;}
       }
+      
     }
+
+    //TODO Move to better place if possible
+    this.updateColors = () => {
+      setColorsToParticles()
+    }
+    this.opacity = 100;
     this.precision = 50;
+
+
+    this.randomize = () => {
+      this.opacity = random(100);
+      this.precision = random(100);
+    }
+    this.processColorScheme();
   }
 
-  processColorPallete(){
+  //MAIN
+  processColorScheme(){
     this.selectedPalleteId = this.selectPalettefromJson();
     this.colorArray = [];
     for (let i=0; i<this.colorsData.palettes[this.selectedPalleteId].length; i++){
-      let colorTemporalArray = this.createColorModesArray(this.colorsData.palettes[this.selectedPalleteId][i])
-      this.colorArray.push(colorTemporalArray);
+      this.colorArray.push(this.colorsData.palettes[this.selectedPalleteId][i]);
     }
-    this.hexColors.color1=this.colorArray[0][2];
-    this.hexColors.color2=this.colorArray[1][2];
-    this.hexColors.color3=this.colorArray[2][2];
-    this.hexColors.color4=this.colorArray[3][2];
-    this.hexColors.color5=this.colorArray[4][2];
+    this.hexColors.color1=this.colorArray[0];
+    this.hexColors.color2=this.colorArray[1];
+    this.hexColors.color3=this.colorArray[2];
+    this.hexColors.color4=this.colorArray[3];
+    this.hexColors.color5=this.colorArray[4];
 
   }
-
 
   selectPalettefromJson(paletteId = undefined){
     let selectedPallete;
@@ -52,7 +65,7 @@ class Color {
     // console.log("color:" + selectedPallete);
   }
 
-
+  //UNUSED
   createColorModesArray(hex){
     const colorToHSL = this.hexToHSL(hex);
     const colorToRGB = this.hexToRGB(hex);
@@ -62,16 +75,7 @@ class Color {
     return colorTemporalArray;
   }
 
-///
-  takeColorFromArray(){
-    const color = []
-    colRand = int(random(0, colorArr.length));
-    color[0] = colorArr[colRand][0];
-    color[1]= colorArr[colRand][1];
-    color[2]= colorArr[colRand][2];
-    return color;
-  }
-
+  //TRANSLATE COLOR MODES
   hexToHSL(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   

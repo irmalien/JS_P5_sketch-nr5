@@ -49,3 +49,59 @@ function mobileVersion(normal, mobile){
     return normal
   }
 }
+
+
+
+
+//OBJECT HELPERS
+function mirrorValue(_value, _max, _min=0){
+  //If value is surpass min or max allowed, translate value to its opposite;
+  //Example: if color hue max = 360 and hue value = 361, then return hue = 1;
+  //_value: input value
+  //_max: maximum allowed value
+  //_min: minumum allowed value
+
+  if(_value>_max){
+    let result = _value-_max;
+    return result;
+  };
+  if(_value<_min){
+    return _value+_max;
+  }
+  else
+    return _value
+}
+
+function limitValue(_value, _max, _min=0){
+  //Limit value to its min and max allowed
+  //Example: if max is 100, and value is 102, return 100;
+  //_value: input value
+  //_max: maximum allowed value
+  //_min: minumum allowed value
+  if (_value>_max){
+    return _max;
+  }
+  else if (_value<_min){
+    return _min;
+  }
+  else {
+    return _value
+  }
+}
+
+function changeValueWithAmplitude(_constant, _perlin, _amplitude){
+  const min = _constant-_amplitude;
+  const max = _constant+_amplitude;
+  return floor(map(noise(_perlin), 0, 1, min, max));
+}
+
+function generatePerlinArr(_amount=100, _scope=10000){
+  //Generate array of randomized numbers
+  //_amount: size of array
+  //_scope: scope of randomized numbers(negative numbers excluding)
+  let arr = [];
+  for(let i=0; i<_amount; i++){
+    arr.push(floor(random(_scope)));
+  }
+  return arr
+}
