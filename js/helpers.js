@@ -105,3 +105,12 @@ function generatePerlinArr(_amount=100, _scope=10000){
   }
   return arr
 }
+
+function edgeless (_pos) {
+  //Takes object x and y positions and if x/y positions is beyond edge, returns position on opposite side. 
+  if (_pos.x > width){_pos.x = 0};
+  if (_pos.x < 0){_pos.x = width};
+  if (_pos.y > height){_pos.y = 0};
+  if (_pos.y < 0){_pos.y = height};
+  return _pos
+}

@@ -1,18 +1,8 @@
 class Particle {
   constructor(_x, _y, _particle, _color=undefined) {    
     //POSITION default values
-    this.position = {
-      x: _x,
-      y: _y,
-
-      edgeless: (_pos) => {
-        if (_pos.x > width){_pos.x = 0};
-        if (_pos.x < 0){_pos.x = width};
-        if (_pos.y > height){_pos.y = 0};
-        if (_pos.y < 0){_pos.y = height};
-        return _pos
-      }
-    }
+    this.position = createVector(_x, _y)
+    this.previousPosition = createVector()
 
     //CIRCLE default values
     this.circleSettings = {}
@@ -23,7 +13,7 @@ class Particle {
     //PERLIN
     this.perlin = generatePerlinArr()
 
-    this.xoffSizeIncrement = random(0.05,0.005);
+    this.xoffSizeIncrement = random(0.02,0.005)
     this.randomnessConst = 2;
 
     // OBJECTS
@@ -54,10 +44,10 @@ class Particle {
     let relativeSize = 1+(width*0.0001);
     this.circleSettings.sizeConst = (_particle.size**relativeSize)/2;
     this.circleSettings.size = this.circleSettings.sizeConst;
-    this.circleSettings.sizeRand = _particle.sizeVariation;
+    this.circleSettings.smoothness = _particle.smoothness;
     this.circleSettings.roundness = _particle.roundness;
-    this.circleSettings.smoothness = this.circleSettings.roundness
-    this.circleSettings.sizeAmplitude = map(this.circleSettings.sizeRand, 0, 100, 0, this.circleSettings.sizeConst);
+    this.circleSettings.sizeVariation = _particle.sizeVariation;
+    this.circleSettings.sizeAmplitude = map(this.circleSettings.sizeVariation, 0, 100, 0, this.circleSettings.sizeConst);
 
     //DYNAMICS
     this.movSpeed = _particle.speed/200;
@@ -76,6 +66,7 @@ class Particle {
   gaussianValues(){
     this.lifespan = randomGaussian(this.lifespan, this.lifespan/this.randomnessConst);
     this.circleSettings.sizeConst = randomGaussian(this.circleSettings.sizeConst, this.circleSettings.sizeConst/this.randomnessConst);
+    this.circleSettings.sizeAmplitude = map(this.circleSettings.sizeVariation, 0, 100, 0, this.circleSettings.sizeConst);
     this.movSpeed = randomGaussian(this.movSpeed, this.movSpeed/this.randomnessConst);
     this.circleObj.newZoff = random(1000);
   }
@@ -113,10 +104,9 @@ class Particle {
   }
 
   resizeParticle(){
-    if(this.circleSettings.sizeRand<100){
-      this.perlin[3] += this.xoffSizeIncrement;
-      this.circleSettings.size = changeValueWithAmplitude(this.circleSettings.sizeConst, this.perlin[3], this.circleSettings.sizeAmplitude)
-    }
+    this.perlin[3] += this.xoffSizeIncrement;
+    this.circleSettings.size = 
+    changeValueWithAmplitude(this.circleSettings.sizeConst, this.perlin[3], this.circleSettings.sizeAmplitude)
   }
 
   moveParticle(){
@@ -136,7 +126,7 @@ class Particle {
       this.perlin[2] += this.movRandY;
       this.position = this.movePerlin(this.position, this.circleSettings.size, this.movSpeed, this.perlin[1], this.perlin[2]);
     }
-    this.position = this.position.edgeless(this.position);
+    this.position = edgeless(this.position);
   }
 
 
@@ -144,8 +134,19 @@ class Particle {
     if(this.alive){
       noStroke();
       fill(this.color.perlin[0], this.color.perlin[1], this.color.perlin[2], this.color.opacity);
-      
-      this.circleObj.draw(this.position, this.circleSettings);
+      push();
+        // stroke(80, 0.1);
+        // noFill();
+        let angleVector = 
+        createVector(this.position.x-this.previousPosition.x, this.position.y-this.previousPosition.y);
+        translate(this.position.x, this.position.y)
+        rotate(angleVector.heading()+PI/2)
+        // line(-this.circleSettings.size*10,0,this.circleSettings.size*10,0)
+        this.circleObj.draw(this.circleSettings);
+      pop();
+
+      this.previousPosition.x = this.position.x;
+      this.previousPosition.y = this.position.y;
     }
   }
 

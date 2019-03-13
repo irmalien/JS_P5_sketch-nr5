@@ -4,22 +4,31 @@ class Circle {
   this.plaseInc = -0.01;
 	this.zoff = random(1000)
   }
-  draw(_position, _circleParam){
-    let smoothness = map(_circleParam.smoothness,0,100,5,0)
-    let min = map(_circleParam.roundness,100,0,_circleParam.size,_circleParam.size*0.5);
-    let max = map(_circleParam.roundness,100,0,_circleParam.size,_circleParam.size*1.5);
+  draw(_circleParam, _position){
+    if(_position===undefined){
+      _position = []
+      _position.x=0;
+      _position.y=0;  
+    }
+    let a = _circleParam.size;
+    let b = _circleParam.size*(_circleParam.roundness/100);
+    let smoothnessA = map(_circleParam.smoothness,0,100,5,0)
+    let smoothnessB = _circleParam.smoothness;
     this.phase+=this.plaseInc;
     this.zoff+=0.01;
     
     push();
     translate(_position.x, _position.y);
     beginShape();
-    for (let a = 0; a<TWO_PI; a+=TWO_PI/100) {
-      this.xoff = map(sin(a+this.phase),-1,1,0,smoothness);
-    	this.yoff = map(cos(a+this.phase),-1,1,0,smoothness);
+    for (let angle = 0; angle<TWO_PI; angle+=TWO_PI/100) {
+      this.xoff = map(sin(angle+this.phase),-1,1,0,smoothnessA);
+      this.yoff = map(cos(angle+this.phase),-1,1,0,smoothnessA);
+      let rEllipse = a*b/(sqrt(sq(b*cos(angle))+sq(a*sin(angle))));
+      let min = map(smoothnessB,100,0,rEllipse,rEllipse*0.5);
+      let max = map(smoothnessB,100,0,rEllipse,rEllipse*1.5);
       this.r = map(noise(this.xoff, this.yoff, this.zoff), 0,1,min, max)
-      let x = this.r*cos(a)+1;
-      let y = this.r*sin(a)+1;
+      let x = this.r*cos(angle)+1;
+      let y = this.r*sin(angle)+1;
       vertex(x,y)
     }
     endShape(CLOSE);

@@ -8,6 +8,7 @@ class ParticleSettings {
     this.lifespanMaxValue = 1000;
     this.size = 5;
     this.sizeVariation = 50;
+    this.smoothness = 90;
     this.roundness = 90;
 
     //Dynamics
@@ -23,8 +24,8 @@ class ParticleSettings {
       this.lifespan = coinFlip(random(100), random(100,1000), .7);
       this.size = coinFlip(random(10), coinFlip(random(10,40), random(40,100), .95), .95);
       this.sizeVariation = random(100);
-      this.roundness = coinFlip(random(50), random(50,100), .1);
-      this.opacity = map(this.size, 100,0,0,100);
+      this.smoothness = coinFlip(random(40), random(40,90), .1);
+      this.roundness = coinFlip(random(60), random(60,100), .1);
       
       this.speed = randomGaussian(30,5);
       this.movement = random(100);

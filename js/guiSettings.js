@@ -24,7 +24,8 @@ function createGUI() {
   f1.add(particleSettings, 'lifespan', 1, particleSettings.lifespanMaxValue).step(1).listen();
   f1.add(particleSettings, 'size', 1, 100).step(1).listen();
   f1.add(particleSettings, 'sizeVariation', 0, 100).step(1).listen();
-  f1.add(particleSettings, 'roundness', 0, 100).step(1).listen();
+  f1.add(particleSettings, 'smoothness', 1, 100).step(1).listen();
+  f1.add(particleSettings, 'roundness', 1, 100).step(1).listen();
   
   let f2 = gui.addFolder('Dynamics');
   f2.add(particleSettings, 'speed', 0, 100).step(1).listen();
