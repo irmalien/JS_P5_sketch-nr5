@@ -3,6 +3,8 @@ class Particle {
     //POSITION default values
     this.position = createVector(_x, _y)
     this.previousPosition = createVector()
+    this.positionAngle = 
+    createVector(this.position.x-this.previousPosition.x, this.position.y-this.previousPosition.y);
 
     //CIRCLE default values
     this.circleSettings = {}
@@ -11,13 +13,13 @@ class Particle {
     this.color=new Color(_color);
 
     //PERLIN
-    this.perlin = generatePerlinArr()
+    this.perlin = generatePerlinArr();
 
-    this.xoffSizeIncrement = random(0.02,0.005)
+    this.xoffSizeIncrement = random(0.02,0.005);
     this.randomnessConst = 2;
 
     // OBJECTS
-    this.circleObj = new Circle()
+    this.circleObj = new Circle();
 
     //FUNCTIONS
     this.setValues(_particle);
@@ -65,7 +67,7 @@ class Particle {
 
   gaussianValues(){
     this.lifespan = randomGaussian(this.lifespan, this.lifespan/this.randomnessConst);
-    this.circleSettings.sizeConst = randomGaussian(this.circleSettings.sizeConst, this.circleSettings.sizeConst/this.randomnessConst);
+    this.circleSettings.sizeConst = randomGaussian(this.circleSettings.sizeConst, this.circleSettings.sizeConst/1.5);
     this.circleSettings.sizeAmplitude = map(this.circleSettings.sizeVariation, 0, 100, 0, this.circleSettings.sizeConst);
     this.movSpeed = randomGaussian(this.movSpeed, this.movSpeed/this.randomnessConst);
     this.circleObj.newZoff = random(1000);
@@ -133,20 +135,26 @@ class Particle {
   drawParticle(){
     if(this.alive){
       noStroke();
+      // this.color.localColor = this.position;
       fill(this.color.perlin[0], this.color.perlin[1], this.color.perlin[2], this.color.opacity);
       push();
         // stroke(80, 0.1);
         // noFill();
-        let angleVector = 
+        let positionAngleNew = 
         createVector(this.position.x-this.previousPosition.x, this.position.y-this.previousPosition.y);
+        // this.positionAngle.x = (positionAngleNew.x+(this.positionAngle.x*2))/3
+        // this.positionAngle.y = (positionAngleNew.y+(this.positionAngle.y*2))/3
+        this.positionAngle.x = (positionAngleNew.x+this.positionAngle.x+this.positionAngle.x+this.positionAngle.x)/4
+        this.positionAngle.y = (positionAngleNew.y+this.positionAngle.y+this.positionAngle.y+this.positionAngle.y)/4
+
         translate(this.position.x, this.position.y)
-        rotate(angleVector.heading()+PI/2)
+        rotate(this.positionAngle.heading()+PI/2)
         // line(-this.circleSettings.size*10,0,this.circleSettings.size*10,0)
         this.circleObj.draw(this.circleSettings);
       pop();
 
-      this.previousPosition.x = this.position.x;
-      this.previousPosition.y = this.position.y;
+      this.previousPosition = this.position.copy();
+
     }
   }
 

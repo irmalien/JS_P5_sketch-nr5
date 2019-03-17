@@ -32,7 +32,7 @@ class ColorScheme {
 
 
     this.randomize = () => {
-      this.opacity = random(100);
+      this.opacity = coinFlip(random(10,50), random(50,90), .1);
       this.precision = random(100);
     }
     this.processColorScheme();
@@ -77,6 +77,9 @@ class ColorScheme {
 
   //TRANSLATE COLOR MODES
   hexToHSL(hex) {
+    if(hex==undefined){
+      hex="#ffffff"
+    }
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   
     var r = parseInt(result[1], 16);
@@ -117,6 +120,9 @@ class ColorScheme {
     return colorInHSL;
   }
   hexToRGB(hex) {
+    if(hex==undefined){
+      hex="#ffffff"
+    }
     let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   
     let r = parseInt(result[1], 16);
@@ -131,5 +137,14 @@ class ColorScheme {
     colorInRGB[2]=b;
   
     return colorInRGB;
+  }
+
+  rgbToHex(r, g, b) {
+    if(r==undefined || g==undefined || b==undefined ){
+      r=255;
+      g=255;
+      b=255;
+    }
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   }
 }

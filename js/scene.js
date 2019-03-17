@@ -2,11 +2,9 @@ class SceneClass {
   constructor() { 
     this.titleFull = "nr5",
     this.titleShort = "nr5",
-    // canvasWidth: document.documentElement.clientWidth,
-    // canvasHeight: document.documentElement.clientHeight,
-    this.width = 4400,
-    this.height = 2616,
-    this.quality = 'good',
+    this.width = document.documentElement.clientWidth,
+    this.height = document.documentElement.clientHeight,
+    this.quality = 'normal',
     this.canvas = createCanvas(this.width, this.height),
     this.canvas.class("canvasClass");
     this.canvas.id("canvasId");
@@ -19,7 +17,7 @@ class SceneClass {
     this.fps = 60,
     
     //OBJECTS in scene
-    this.quantity = floor(random(10,50));
+    this.quantity = floor(random(20,70));
 
     //CALL METHODS
     this.clearBackground = () => {

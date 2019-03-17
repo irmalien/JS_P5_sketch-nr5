@@ -14,13 +14,14 @@ class Circle {
     let b = _circleParam.size*(_circleParam.roundness/100);
     let smoothnessA = map(_circleParam.smoothness,0,100,5,0)
     let smoothnessB = _circleParam.smoothness;
+    let quality = map(_circleParam.roundness, 0, 100, 300,100)
     this.phase+=this.plaseInc;
     this.zoff+=0.01;
     
     push();
     translate(_position.x, _position.y);
     beginShape();
-    for (let angle = 0; angle<TWO_PI; angle+=TWO_PI/100) {
+    for (let angle = 0; angle<TWO_PI; angle+=TWO_PI/quality) {
       this.xoff = map(sin(angle+this.phase),-1,1,0,smoothnessA);
       this.yoff = map(cos(angle+this.phase),-1,1,0,smoothnessA);
       let rEllipse = a*b/(sqrt(sq(b*cos(angle))+sq(a*sin(angle))));

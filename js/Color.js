@@ -1,8 +1,11 @@
 class Color {
   constructor(_color) {
+    this.colorObj = _color
+
     this.color = {
-      const: _color.hexToHSL(_color.hexColors.randomColor()),
-      main: _color.hexToHSL(_color.hexColors.randomColor()),
+      const: this.colorObj.hexToHSL(_color.hexColors.randomColor()),
+      main: this.colorObj.hexToHSL(_color.hexColors.randomColor()),
+      local: null,
       amplitude: map((_color.precision), 0,100, 50,0),
       opacity: _color.opacity/100
     }
@@ -27,8 +30,6 @@ class Color {
     return this.color.main;
   }
 
-
-
   perlinColor(_const, _perlin, _amplitude){
     let newColor = [];
     _perlin[4]+=0.001;
@@ -44,5 +45,31 @@ class Color {
     return newColor;
   }
 
+  //Not working as expected
+  get mixedLocal(){
+    let colorA = this.perlinColor(this.color.const, this.perlinArr, this.color.amplitude);
+    let colorB;
+    if(this.color.local){
+      colorB = this.color.local;
+    }
+    else{
+      colorB = colorA;
+    }
+    let colorC = this.oldColor
+
+    let colorD = [];
+    colorD[0] = (colorA[0]+(colorB[0]*9))/10;
+    colorD[1] = (colorA[1]+(colorB[1]*9))/10;
+    colorD[2] = (colorA[2]+(colorB[2]*9))/10;
+    return colorD;
+
+  }
+
+  set localColor(_pos){
+    const localColRGB = get(_pos.x, _pos.y);
+    const localColHEX = this.colorObj.rgbToHex(localColRGB[0], localColRGB[1], localColRGB[2]);
+    const localColHSL = this.colorObj.hexToHSL(localColHEX);
+    this.color.local = localColHSL;
+  }
 
 }
