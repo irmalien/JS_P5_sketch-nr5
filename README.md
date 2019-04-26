@@ -5,8 +5,7 @@ Number 5 is named after famous painting of American artist Jackson Pollock best 
 [Visit site](http://www.mvcd.se/projects/nr5/index.html)
 
 ### Example output
-![Example output from the webapp](painting-demo.png)
-*This output was done with default settings.*
+![Example output from the webapp](http://www.mvcd.se/img/heroes/nr5/codesign-nr5_hero-1280x761.jpg)
 
 ### Usage
 1. Go visit the project web page listed on top of the repo.
